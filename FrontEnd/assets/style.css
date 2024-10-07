@@ -140,9 +140,6 @@ header {
   justify-content: space-between;
   margin: 50px 0;
 }
-section {
-  margin: 50px 0;
-}
 
 h1 {
   display: flex;
@@ -215,7 +212,6 @@ li a:hover {
 }
 #portfolio h2 {
   text-align: center;
-  margin-bottom: 1em;
 }
 .gallery {
   width: 100%;
@@ -276,8 +272,21 @@ footer nav ul {
   margin: 2em;
 }
 
+footer nav ul li {
+  cursor: pointer;
+}
+
 .hidden {
   display: none !important;
+}
+
+#introduction {
+  margin-top: 90px;
+  margin-bottom: 140px;
+}
+
+#portfolio {
+  margin-bottom: 50px;
 }
 
 /* BANDEAU */
@@ -305,6 +314,63 @@ footer nav ul {
   font-size: 16px;
 }
 
+/* PROJETS DIV */
+
+.projets {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.open__modal {
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.open__modal:hover {
+  color: #b1663c;
+}
+
+.fa-pen-to-square {
+  font-size: 14px;
+}
+
+/* FILTER BTN */
+
+.div__filter {
+  margin-bottom: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn__filter {
+  border: 1px solid #1d6154;
+  border-radius: 60px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1d6154;
+  background-color: transparent;
+  padding: 10px 20px;
+  min-width: 100px;
+  cursor: pointer;
+}
+
+.btn__filter:hover {
+  color: #fff;
+  background-color: #1d6154;
+}
+
+.btn__filter:focus {
+  color: #fff;
+  background-color: #1d6154;
+}
+
 /* MODAL */
 
 /* MODAL GALLERY */
@@ -319,7 +385,6 @@ footer nav ul {
 .modal__header {
   padding: 26px 30px 0 30px;
   display: flex;
-  /* justify-content: space-between; */
   justify-content: end;
 }
 
@@ -334,7 +399,6 @@ footer nav ul {
 
 .modal__container__gallery {
   display: flex;
-  /* display: none; */
   flex-direction: column;
   align-items: center;
   padding: 10px 105px 45px 105px;

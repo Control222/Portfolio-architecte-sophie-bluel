@@ -1,6 +1,8 @@
 const reponse = await fetch('http://localhost:5678/api/works');
 const works = await reponse.json();
 
+let imageFile = null;
+
 console.log('works', works);
 
 /* *** Ajouter à la galerie les travaux de l'architecte */
@@ -70,16 +72,44 @@ btnFiltrerHotels.addEventListener('click', () => {
 
 const token = localStorage.getItem('token');
 
+const bandeau = document.querySelector('.bandeau');
+const filtersContainer = document.querySelector('.div__filter');
+const divProjet = document.querySelector('.projets');
+const loginButton = document.querySelector('.login');
+const logoutButton = document.querySelector('.logout');
+const openModalButton = document.querySelector('.open__modal');
+
 function modeAdmin() {
   if (token) {
-    const bandeau = document.querySelector('.bandeau');
     bandeau.classList.remove('hidden');
 
-    const filtersContainer = document.querySelector('.div__filter');
     filtersContainer.classList.add('hidden');
+
+    loginButton.classList.add('hidden');
+    logoutButton.classList.remove('hidden');
+
+    divProjet.style.marginBottom = '90px';
+
+    openModalButton.classList.remove('hidden');
+  } else {
+    bandeau.classList.add('hidden');
+
+    filtersContainer.classList.remove('hidden');
+
+    loginButton.classList.remove('hidden');
+    logoutButton.classList.add('hidden');
+
+    divProjet.style.marginBottom = '50px';
+
+    openModalButton.classList.add('hidden');
   }
 }
 modeAdmin();
+
+// Deconnexion
+logoutButton.addEventListener('click', () => {
+  localStorage.removeItem('token');
+});
 
 /* MODAL */
 
@@ -183,7 +213,7 @@ projetForm.addEventListener('submit', async (event) => {
   const categoryId = document.getElementById('modal__image__categorie');
   const image = document.getElementById('modal__file__input');
 
-  if (!title || !categoryId || !image) {
+  if (!title || !categoryId || !imageFile) {
     formError.style.display = 'block';
     formError.innerText = 'Tous les champs sont requis !';
     return;
@@ -194,7 +224,7 @@ projetForm.addEventListener('submit', async (event) => {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('category', categoryId);
-  formData.append('image', image);
+  formData.append('image', imageFile);
 
   console.log('Form data:', formData); /* TEST */
 
@@ -237,6 +267,7 @@ fileInput.addEventListener('change', (event) => {
   const file = event.target.files[0];
 
   if (file) {
+    imageFile = file;
     console.log('File selected', file.name);
 
     const previewImage = document.querySelector('.modal__upload');
