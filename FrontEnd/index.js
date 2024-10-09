@@ -1,5 +1,6 @@
 const reponse = await fetch('http://localhost:5678/api/works');
-const works = await reponse.json();
+let works = [];
+works = await reponse.json();
 
 let imageFile = null;
 
@@ -113,34 +114,9 @@ logoutButton.addEventListener('click', () => {
 
 /* MODAL */
 
-/* *** Delete projet */
-
-async function deleteProjet(e) {
-  const projectId = e.target.closest('figure').dataset.id;
-
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    alert('Vous devez être connecté pour supprimer des projets.');
-    return;
-  }
-
-  const response = await fetch(`http://localhost:5678/api/works/${projectId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (response.ok) {
-    console.log(`${projectId} a été supprimé avec succés`);
-    e.target.closest('figure').remove();
-  } else {
-    console.error("Une erreur s'est produite !");
-  }
-}
-
 /* *** Ajouter à la galerie modal les travaux de l'architecte*/
+
+let projectId;
 
 function genererProjetsModal(works) {
   const modalGallery = document.querySelector('.modal__gallery');
@@ -172,14 +148,59 @@ function genererProjetsModal(works) {
     modalProjetElement.appendChild(trashButton);
 
     // Event listener to trash btn
-    trashButton.addEventListener('click', deleteProjet);
+    trashButton.addEventListener('click', async () => {
+      // Delete projet
+
+      projectId = modalArticle.id;
+      console.log(`Supprimer projet ID: ${projectId}`);
+
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        alert('Vous devez être connecté pour supprimer des projets.');
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `http://localhost:5678/api/works/${projectId}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          console.log(`${projectId} a été supprimé avec succés`);
+          // Remove from the works array
+          const index = works.findIndex((work) => work.id === projectId);
+          works.splice(index, 1);
+
+          // Rafraichir galleries
+          genererProjetsModal(works);
+          genererProjets(works);
+        } else {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message ||
+              "Une erreur s'est produite lors de la suppression"
+          );
+        }
+      } catch (error) {
+        console.error(`Erreur supprimer projet: ${error.message}`);
+        alert(`Erreur: ${error.message}`);
+      }
+    });
   }
 }
 genererProjetsModal(works);
 
 /* *** Ajouter nouvelle image */
 
-// Caterogie options
+// Categorie options
 
 async function categoriesOptions() {
   const response = await fetch('http://localhost:5678/api/categories');
@@ -209,9 +230,8 @@ projetForm.appendChild(formError);
 projetForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const title = document.getElementById('modal__input__title');
-  const categoryId = document.getElementById('modal__image__categorie');
-  const image = document.getElementById('modal__file__input');
+  const title = document.getElementById('modal__input__title').value.trim();
+  const categoryId = document.getElementById('modal__image__categorie').value;
 
   if (!title || !categoryId || !imageFile) {
     formError.style.display = 'block';
@@ -223,7 +243,7 @@ projetForm.addEventListener('submit', async (event) => {
 
   const formData = new FormData();
   formData.append('title', title);
-  formData.append('category', categoryId);
+  formData.append('category', parseInt(categoryId, 10)); /* Integrer */
   formData.append('image', imageFile);
 
   console.log('Form data:', formData); /* TEST */
@@ -239,14 +259,19 @@ projetForm.addEventListener('submit', async (event) => {
     });
 
     console.log(response);
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Une erreur s'est produite");
     }
 
     const newProjet = await response.json();
+    console.log('Nouveau projet ajouté:', newProjet);
 
-    genererProjets(newProjet);
+    works.push(newProjet);
+
+    genererProjets(works);
+    genererProjetsModal(works);
   } catch (error) {
     formError.style.display = 'block';
     formError.innerText = `Erreur: ${error.message}`;
